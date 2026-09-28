@@ -9,6 +9,7 @@ from collections.abc import Mapping
 
 import uvicorn
 
+from app_runtime.bindings import validate_bindings
 from app_runtime.errors import AppRuntimeError, ConfigurationError
 from app_runtime.frameworks import build_application
 from app_runtime.loader import load_app
@@ -27,6 +28,7 @@ def run(environment: Mapping[str, str]) -> int:
     loaded = load_app(environment)
     streamlit: StreamlitProcess | None = None
     try:
+        validate_bindings(loaded.config.bindings)
         os.chdir(loaded.root)
         port = public_port(environment, loaded.config.port)
         if loaded.config.framework == "streamlit":

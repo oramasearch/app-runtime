@@ -19,6 +19,7 @@ from websockets.exceptions import ConnectionClosed
 
 from app_runtime.errors import ConfigurationError, LoadError
 from app_runtime.frameworks import confined_path
+from app_runtime.user_context import CurrentUserMiddleware
 
 HOP_BY_HOP_HEADERS = {
     "connection",
@@ -98,6 +99,7 @@ class StreamlitProcess:
 
 def build_streamlit_proxy(process: StreamlitProcess) -> FastAPI:
     application = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
+    application.add_middleware(CurrentUserMiddleware)
 
     @application.get("/healthz", include_in_schema=False)
     async def health() -> dict[str, str]:
@@ -153,9 +155,24 @@ def build_streamlit_proxy(process: StreamlitProcess) -> FastAPI:
         query = f"?{websocket.url.query}" if websocket.url.query else ""
         requested = websocket.headers.get("sec-websocket-protocol", "")
         subprotocols = [item.strip() for item in requested.split(",") if item.strip()]
+        forwarded_headers = {
+            name: value
+            for name, value in websocket.headers.items()
+            if name.lower()
+            not in {
+                "connection",
+                "host",
+                "sec-websocket-extensions",
+                "sec-websocket-key",
+                "sec-websocket-protocol",
+                "sec-websocket-version",
+                "upgrade",
+            }
+        }
         try:
             async with connect(
                 f"{process.websocket_url}/{path}{query}",
+                additional_headers=forwarded_headers,
                 subprotocols=subprotocols or None,
             ) as upstream:
                 await websocket.accept(subprotocol=upstream.subprotocol)

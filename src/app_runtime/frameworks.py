@@ -12,6 +12,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app_runtime.config import AppConfig
 from app_runtime.errors import ConfigurationError
+from app_runtime.user_context import CurrentUserMiddleware
 
 
 def build_application(root: Path, config: AppConfig) -> FastAPI:
@@ -58,6 +59,7 @@ def build_static_application(root: Path, entrypoint: str) -> FastAPI:
 
 def health_application() -> FastAPI:
     application = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
+    application.add_middleware(CurrentUserMiddleware)
 
     @application.get("/healthz", include_in_schema=False)
     async def health() -> dict[str, str]:
@@ -87,4 +89,3 @@ def confined_path(root: Path, relative: str) -> Path:
     except ValueError as error:
         raise ConfigurationError(f"entrypoint escapes the App root: {relative}") from error
     return candidate
-

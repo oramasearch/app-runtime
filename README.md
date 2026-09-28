@@ -30,3 +30,14 @@ are in [Frameworks and health](docs/runtime/frameworks.md).
 
 The Python 3.12 image runs as UID 10001 and stores App code below `/tmp`, making it compatible with
 a read-only root filesystem and writable `/tmp`.
+
+## Bindings and data Apps
+
+The operator mounts binding JSON at `/var/run/orama/bindings/zetta` and
+`/var/run/orama/bindings/services/<name>`. The `orama_app` package provides `zetta()` for governed
+workspace SQL, datasets, runs, models and scoring; `service(name)` for Service connection fields;
+and request-local `current_user()` for `auth: lake`. See [`orama_app` and bindings](docs/data-apps/bindings.md)
+for file shapes and examples.
+
+[`examples/data-dashboard`](examples/data-dashboard/) is a Streamlit App that lists datasets from
+a fakeable Zetta binding and previews workspace rows.

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib.metadata
+import re
 import tomllib
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -26,6 +27,7 @@ BAKED_DEPENDENCIES = frozenset(
     }
 )
 FRAMEWORKS = frozenset({"fastapi", "static", "streamlit"})
+SERVICE_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 
 
 @dataclass(frozen=True)
@@ -144,6 +146,7 @@ def parse_bindings(value: Any) -> BindingRequirements:
         ]
         if unknown:
             raise ConfigurationError("unknown bindings: " + ", ".join(unknown))
+        validate_service_names(services)
         return BindingRequirements(zetta=zetta, services=services)
     if isinstance(value, dict):
         zetta = value.get("zetta", False)
@@ -157,5 +160,13 @@ def parse_bindings(value: Any) -> BindingRequirements:
         unknown = set(value) - {"zetta", "services"}
         if unknown:
             raise ConfigurationError("unknown binding keys: " + ", ".join(sorted(unknown)))
-        return BindingRequirements(zetta=zetta, services=tuple(services))
+        parsed_services = tuple(services)
+        validate_service_names(parsed_services)
+        return BindingRequirements(zetta=zetta, services=parsed_services)
     raise ConfigurationError("bindings must be a table or an array")
+
+
+def validate_service_names(services: tuple[str, ...]) -> None:
+    invalid = [name for name in services if not SERVICE_NAME.fullmatch(name)]
+    if invalid:
+        raise ConfigurationError("invalid Service binding names: " + ", ".join(invalid))
