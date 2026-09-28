@@ -30,9 +30,11 @@ app = FastAPI()
 
 @app.get("/hello")
 async def hello():
-    return {"hello": "world"}
+    from greeting import message
+    return {"hello": message}
 """,
         "app.py",
+        extra_files={"greeting.py": "message = 'world'\n"},
     )
     try:
         application = build_application(loaded.root, loaded.config)
@@ -107,11 +109,18 @@ async def test_static_app_has_health_checks_and_content(tmp_path: Path) -> None:
         assert "Static App" in (await client.get("/")).text
 
 
-def fake_lake_app(manifest: str, source: str, source_path: str) -> LoadedApp:
+def fake_lake_app(
+    manifest: str,
+    source: str,
+    source_path: str,
+    extra_files: dict[str, str] | None = None,
+) -> LoadedApp:
     files = {
         "app/app.toml": manifest,
         f"app/{source_path}": source,
     }
+    for path, contents in (extra_files or {}).items():
+        files[f"app/{path}"] = contents
 
     def fake_lake(request: httpx.Request) -> httpx.Response:
         query = parse_qs(request.url.query.decode())

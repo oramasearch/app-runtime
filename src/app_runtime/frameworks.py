@@ -28,13 +28,13 @@ def build_fastapi_application(root: Path, entrypoint: str) -> FastAPI:
     if not separator or not module_name or not object_name:
         raise ConfigurationError("a FastAPI entrypoint must be module:object")
     ensure_local_module(root, module_name)
-    sys.path.insert(0, str(root))
+    root_string = str(root)
+    if root_string not in sys.path:
+        sys.path.insert(0, root_string)
     try:
         module = importlib.import_module(module_name)
     except Exception as error:
         raise ConfigurationError(f"cannot import FastAPI module {module_name}: {error}") from error
-    finally:
-        sys.path.remove(str(root))
     try:
         user_application: Any = getattr(module, object_name)
     except AttributeError as error:

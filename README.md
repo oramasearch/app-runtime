@@ -26,7 +26,8 @@ FastAPI Apps name a `module:object`, Streamlit Apps name a Python script and sta
 content directory. Every framework serves `/healthz` and `/readyz` on the public port. `APP_PORT`
 overrides the manifest port; the image defaults it to 8080. Streamlit runs on loopback behind the
 runtime so its application traffic and the common health contract share one public port. Details
-are in [Frameworks and health](docs/runtime/frameworks.md).
+are in [Frameworks and health](docs/runtime/frameworks.md). The downloaded App root remains on
+Python's module path while it is served, including for imports performed inside request handlers.
 
 The Python 3.12 image runs as UID 10001 and stores App code below `/tmp`, making it compatible with
 a read-only root filesystem and writable `/tmp`.
