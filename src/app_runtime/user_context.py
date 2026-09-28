@@ -21,4 +21,3 @@ class CurrentUserMiddleware:
             await self.application(scope, receive, send)
         finally:
             reset_current_user(token)
-

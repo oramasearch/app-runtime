@@ -63,4 +63,3 @@ the same JSON object for local development only.
 
 The [data dashboard example](../../examples/data-dashboard/) lists the workspace datasets and
 previews the selected dataset with governed SQL.
-

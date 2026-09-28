@@ -47,4 +47,3 @@ def quote_identifier(value: str) -> str:
 
 if __name__ == "__main__":
     main()
-

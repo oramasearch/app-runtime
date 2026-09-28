@@ -15,4 +15,3 @@ class LoadError(AppRuntimeError):
 
 class DependencyError(AppRuntimeError):
     """The App requests a dependency that is not baked into the runtime."""
-

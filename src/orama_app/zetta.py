@@ -139,4 +139,3 @@ def require_list(value: Any, key: str, capability: str) -> list[dict[str, Any]]:
     if not isinstance(value, dict) or not isinstance(value.get(key), list):
         raise ZettaError(f"{capability} returned an invalid {key} value")
     return value[key]
-

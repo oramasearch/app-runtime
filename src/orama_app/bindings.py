@@ -48,4 +48,3 @@ def read_binding(path: Path) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise BindingError(f"binding must contain a JSON object: {path}")
     return value
-
