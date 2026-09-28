@@ -5,7 +5,7 @@ from __future__ import annotations
 import base64
 from dataclasses import dataclass
 from pathlib import PurePosixPath
-from typing import Any
+from typing import Any, Self
 
 import httpx
 
@@ -38,7 +38,7 @@ class LakeRepository:
     def close(self) -> None:
         self.client.close()
 
-    def __enter__(self) -> "LakeRepository":
+    def __enter__(self) -> Self:
         return self
 
     def __exit__(self, *_: object) -> None:
@@ -117,4 +117,3 @@ def decode_contents(body: Any, path: str) -> bytes:
         except ValueError as error:
             raise LoadError(f"repository_file returned invalid base64 for {path}") from error
     return contents.encode()
-

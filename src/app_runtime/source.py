@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import os
+from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import Mapping
 
 from app_runtime.errors import ConfigurationError
 
@@ -19,7 +19,7 @@ class AppSource:
     path: str = ""
 
     @classmethod
-    def from_environment(cls, environment: Mapping[str, str] | None = None) -> "AppSource":
+    def from_environment(cls, environment: Mapping[str, str] | None = None) -> AppSource:
         values = os.environ if environment is None else environment
         combined = values.get("APP_SOURCE", "").strip()
         if combined:
@@ -53,4 +53,3 @@ class AppSource:
             raise ConfigurationError("APP_REVISION must be a pinned revision")
         if any(part == ".." for part in self.path.split("/")):
             raise ConfigurationError("APP_PATH must stay inside the repository")
-

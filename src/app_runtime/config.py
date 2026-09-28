@@ -44,7 +44,7 @@ class AppConfig:
     bindings: BindingRequirements = field(default_factory=BindingRequirements)
 
     @classmethod
-    def read(cls, manifest: Path) -> "AppConfig":
+    def read(cls, manifest: Path) -> AppConfig:
         try:
             with manifest.open("rb") as stream:
                 values = tomllib.load(stream)
@@ -55,7 +55,7 @@ class AppConfig:
         return cls.from_mapping(values)
 
     @classmethod
-    def from_mapping(cls, values: dict[str, Any]) -> "AppConfig":
+    def from_mapping(cls, values: dict[str, Any]) -> AppConfig:
         name = required_string(values, "name")
         framework = required_string(values, "framework").lower()
         if framework not in FRAMEWORKS:
@@ -159,4 +159,3 @@ def parse_bindings(value: Any) -> BindingRequirements:
             raise ConfigurationError("unknown binding keys: " + ", ".join(sorted(unknown)))
         return BindingRequirements(zetta=zetta, services=tuple(services))
     raise ConfigurationError("bindings must be a table or an array")
-

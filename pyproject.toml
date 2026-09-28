@@ -17,6 +17,9 @@ dependencies = [
     "uvicorn[standard]==0.35.0",
 ]
 
+[project.scripts]
+app-runtime = "app_runtime.main:main"
+
 [build-system]
 requires = ["uv_build==0.11.7"]
 build-backend = "uv_build"

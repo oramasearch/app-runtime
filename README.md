@@ -19,3 +19,14 @@ the exact environment contract and startup refusals.
 
 The pinned baked set is FastAPI, Uvicorn, Streamlit, pandas, NumPy, Plotly, HTTPX, Pydantic and
 Jinja. Apps needing anything else use image mode.
+
+## Frameworks and health
+
+FastAPI Apps name a `module:object`, Streamlit Apps name a Python script and static Apps name a
+content directory. Every framework serves `/healthz` and `/readyz` on the public port. `APP_PORT`
+overrides the manifest port; the image defaults it to 8080. Streamlit runs on loopback behind the
+runtime so its application traffic and the common health contract share one public port. Details
+are in [Frameworks and health](docs/runtime/frameworks.md).
+
+The Python 3.12 image runs as UID 10001 and stores App code below `/tmp`, making it compatible with
+a read-only root filesystem and writable `/tmp`.

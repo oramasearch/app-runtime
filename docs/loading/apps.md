@@ -27,11 +27,11 @@ services = ["reporting-postgres"]
 ```
 
 Dependencies may instead be a TOML table mapping package names to versions or constraints. The
-runtime installs nothing after startup. An App may declare only the pinned packages already baked
-into the image: `fastapi`, `uvicorn`, `streamlit`, `pandas`, `numpy`, `plotly`, `httpx`, `pydantic`
-and `jinja2`. A package outside that set, a direct URL, or an incompatible version is refused with
-guidance to use App image mode.
+runtime installs nothing after startup. An App may declare only the packages already baked into
+the image: `fastapi==0.116.1`, `uvicorn==0.35.0`, `streamlit==1.48.1`, `pandas==2.3.1`,
+`numpy==2.3.2`, `plotly==6.2.0`, `httpx==0.28.1`, `pydantic==2.11.7` and `jinja2==3.1.6`. A package
+outside that set, a direct URL, or an incompatible version is refused with guidance to use App
+image mode.
 
 `bindings` can also be written as `bindings = ["zetta", "service:reporting-postgres"]`. Required
 binding files are checked before the App is served.
-

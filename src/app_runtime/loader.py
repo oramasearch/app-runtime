@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import os
 import tempfile
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Mapping
 
 import httpx
 
@@ -57,4 +57,3 @@ def remove_materialized_app(root: Path) -> None:
         elif child.is_dir():
             child.rmdir()
     root.rmdir()
-
