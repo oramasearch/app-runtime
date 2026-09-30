@@ -31,6 +31,9 @@ def current_user() -> dict[str, Any] | None:
 def user_from_headers(headers: Mapping[str, str]) -> dict[str, Any] | None:
     serialized = headers.get("x-orama-user")
     if serialized:
+        # Lake's forward-auth sends the member's id; a JSON object is also accepted.
+        if not serialized.lstrip().startswith("{"):
+            return {"id": serialized.strip()}
         return decode_user(serialized)
     user_id = headers.get("x-orama-user-id") or headers.get("x-auth-request-user")
     if not user_id:

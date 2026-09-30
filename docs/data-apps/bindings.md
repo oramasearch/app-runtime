@@ -48,8 +48,9 @@ binding directory.
 
 ## Signed-in user
 
-For `auth: lake`, the auth proxy passes either `X-Orama-User` as a JSON object or
-`X-Orama-User-Id` with optional `X-Orama-User-Email` and `X-Orama-User-Name`. The runtime keeps the
+For `auth: lake`, Lake's forward-auth passes `X-Orama-User` as the member's id (the runtime exposes
+it as `{"id": ...}`) and `X-Orama-Space` as the workspace. `X-Orama-User` may also be a JSON
+object, and `X-Orama-User-Id` with optional `X-Orama-User-Email` and `X-Orama-User-Name` is accepted. The runtime keeps the
 identity request-local for FastAPI and forwards the headers to Streamlit:
 
 ```python
