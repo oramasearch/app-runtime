@@ -165,3 +165,15 @@ class FakeStreamlit:
 
     def selectbox(self, _: str, choices: list[str]) -> str:
         return choices[0]
+
+
+def test_lake_forward_auth_sends_a_bare_member_id() -> None:
+    from orama_app.user import user_from_headers
+
+    assert user_from_headers({"x-orama-user": "accc9652-3ade-4c07-8047-b0fa3c909f90"}) == {
+        "id": "accc9652-3ade-4c07-8047-b0fa3c909f90"
+    }
+    assert user_from_headers({"x-orama-user": '{"id": "u1", "email": "a@example.test"}'}) == {
+        "id": "u1",
+        "email": "a@example.test",
+    }
