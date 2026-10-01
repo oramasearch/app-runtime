@@ -87,18 +87,23 @@ class AppConfig:
             except InvalidRequirement as error:
                 raise ConfigurationError(f"invalid dependency {declared!r}: {error}") from error
             normalized = requirement.name.lower().replace("_", "-")
-            if normalized not in BAKED_DEPENDENCIES or requirement.url:
+            if requirement.url:
                 refused.append(declared)
                 continue
             if requirement.marker and not requirement.marker.evaluate():
                 continue
-            installed = importlib.metadata.version(normalized)
+            try:
+                # Baked packages, or ones lake's build_app installed into this image's venv.
+                installed = importlib.metadata.version(normalized)
+            except importlib.metadata.PackageNotFoundError:
+                refused.append(declared)
+                continue
             if requirement.specifier and installed not in requirement.specifier:
                 mismatched.append(f"{declared} (runtime has {installed})")
         if refused or mismatched:
             details = []
             if refused:
-                details.append("not in the baked set: " + ", ".join(refused))
+                details.append("not installed in this runtime: " + ", ".join(refused))
             if mismatched:
                 details.append("version not satisfied: " + ", ".join(mismatched))
             raise DependencyError(

@@ -69,6 +69,19 @@ def test_disallowed_dependency_refuses_with_image_mode_guidance(tmp_path: Path) 
         config.validate_dependencies()
 
 
+def test_installed_dependency_outside_the_baked_set_is_accepted() -> None:
+    # An image from lake's build_app has the App's extra packages installed in /app/.venv.
+    config = AppConfig.from_mapping(
+        {
+            "name": "custom",
+            "framework": "fastapi",
+            "entrypoint": "app:app",
+            "dependencies": ["packaging"],
+        }
+    )
+    config.validate_dependencies()
+
+
 def test_repository_path_escape_is_refused() -> None:
     def fake_lake(_: httpx.Request) -> httpx.Response:
         return httpx.Response(
