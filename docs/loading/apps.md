@@ -12,6 +12,12 @@ the bearer token used for lake's `repository_tree` and `repository_file` capabil
 revision is refused. The files are written below `/tmp`, so the image's root filesystem can remain
 read-only.
 
+Image mode sets no source. When neither `APP_SOURCE` nor `APP_REPOSITORY` is present and
+`APP_ROOT` (default `/app`) holds an `app.toml`, the runtime loads that baked App in place: lake's
+`build_app` copies the App's files there and installs its extra dependencies into `/app/.venv`.
+The baked root is never removed, and no `APP_TOKEN` is needed. Without either, the source
+variables are required as above.
+
 The selected path must contain `app.toml`:
 
 ```toml

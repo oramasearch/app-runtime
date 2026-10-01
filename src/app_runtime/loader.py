@@ -20,7 +20,10 @@ from app_runtime.source import AppSource
 class LoadedApp:
     root: Path
     config: AppConfig
-    source: AppSource
+    source: AppSource | None
+    # True when the App's files were baked into the image (lake's build_app copies them to
+    # /app); its root is never removed.
+    baked: bool = False
 
 
 def load_app(
@@ -28,6 +31,13 @@ def load_app(
     transport: httpx.BaseTransport | None = None,
 ) -> LoadedApp:
     values = os.environ if environment is None else environment
+    if not values.get("APP_SOURCE", "").strip() and not values.get("APP_REPOSITORY", "").strip():
+        # Image mode: no source to fetch; an image from build_app carries the App in /app.
+        root = Path(values.get("APP_ROOT", "/app"))
+        if (root / "app.toml").is_file():
+            config = AppConfig.read(root / "app.toml")
+            config.validate_dependencies()
+            return LoadedApp(root=root, config=config, source=None, baked=True)
     source = AppSource.from_environment(values)
     token = values.get("APP_TOKEN", "").strip()
     if not token:
