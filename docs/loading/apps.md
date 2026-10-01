@@ -41,3 +41,7 @@ image mode.
 
 `bindings` can also be written as `bindings = ["zetta", "service:reporting-postgres"]`. Required
 binding files are checked before the App is served.
+
+A FastAPI App's own `lifespan` (startup and shutdown work such as creating tables) runs inside the
+runtime's lifespan: Starlette never runs a mounted sub-application's lifespan, so the runtime runs
+it explicitly.

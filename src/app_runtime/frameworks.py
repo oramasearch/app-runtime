@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib
+from contextlib import asynccontextmanager
 import sys
 from pathlib import Path
 from typing import Any
@@ -43,9 +44,25 @@ def build_fastapi_application(root: Path, entrypoint: str) -> FastAPI:
         ) from error
     if not callable(user_application):
         raise ConfigurationError(f"FastAPI entrypoint {entrypoint} is not an ASGI application")
-    application = health_application()
+    application = health_application(lifespan=mounted_lifespan(user_application))
     application.mount("/", user_application)
     return application
+
+
+def mounted_lifespan(user_application: Any):
+    """Run the mounted App's own lifespan: Starlette never runs a mounted sub-app's lifespan, so
+    an App's startup work (creating its tables, opening pools) would silently never happen."""
+    router = getattr(user_application, "router", None)
+    context = getattr(router, "lifespan_context", None)
+    if context is None:
+        return None
+
+    @asynccontextmanager
+    async def lifespan(_: FastAPI):
+        async with context(user_application):
+            yield
+
+    return lifespan
 
 
 def build_static_application(root: Path, entrypoint: str) -> FastAPI:
@@ -57,8 +74,8 @@ def build_static_application(root: Path, entrypoint: str) -> FastAPI:
     return application
 
 
-def health_application() -> FastAPI:
-    application = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
+def health_application(lifespan: Any = None) -> FastAPI:
+    application = FastAPI(docs_url=None, redoc_url=None, openapi_url=None, lifespan=lifespan)
     application.add_middleware(CurrentUserMiddleware)
 
     @application.get("/healthz", include_in_schema=False)
