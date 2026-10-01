@@ -18,7 +18,9 @@ Every App has an `app.toml` containing its `name`, `framework`, `entrypoint`, `p
 the exact environment contract and startup refusals.
 
 The pinned baked set is FastAPI, Uvicorn, Streamlit, pandas, NumPy, Plotly, HTTPX, Pydantic and
-Jinja. Apps needing anything else use image mode.
+Jinja. Apps needing anything else use image mode: lake's `build_app` installs the extra
+packages into this image's `/app/.venv`, and startup accepts any declared dependency that is
+installed and satisfies its specifier (URL requirements are always refused).
 
 ## Frameworks and health
 
