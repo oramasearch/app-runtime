@@ -140,3 +140,50 @@ def fake_lake_app(
         },
         transport=httpx.MockTransport(fake_lake),
     )
+
+
+@pytest.mark.anyio
+async def test_fastapi_app_lifespan_runs_inside_the_runtime() -> None:
+    # Starlette never runs a mounted sub-app's lifespan; the runtime runs it, so an App's startup
+    # work (live 2026-10-01: creating its notes table) happens.
+    loaded = fake_lake_app(
+        """\
+name = "Lifespan"
+framework = "fastapi"
+entrypoint = "lifespan_app:app"
+port = 8080
+dependencies = ["fastapi"]
+""",
+        """\
+from contextlib import asynccontextmanager
+from fastapi import FastAPI
+
+state = {"started": False, "stopped": False}
+
+@asynccontextmanager
+async def lifespan(app):
+    state["started"] = True
+    yield
+    state["stopped"] = True
+
+app = FastAPI(lifespan=lifespan)
+
+@app.get("/state")
+async def read_state():
+    return state
+""",
+        "lifespan_app.py",
+    )
+    try:
+        application = build_application(loaded.root, loaded.config)
+        async with application.router.lifespan_context(application):
+            async with httpx.AsyncClient(
+                transport=httpx.ASGITransport(app=application),
+                base_url="http://runtime",
+            ) as client:
+                assert (await client.get("/state")).json() == {"started": True, "stopped": False}
+        import lifespan_app
+
+        assert lifespan_app.state["stopped"] is True
+    finally:
+        shutil.rmtree(loaded.root)
