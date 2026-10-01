@@ -42,7 +42,8 @@ def run(environment: Mapping[str, str]) -> int:
         if streamlit is not None:
             streamlit.stop()
         os.chdir("/tmp")
-        shutil.rmtree(loaded.root)
+        if not loaded.baked:
+            shutil.rmtree(loaded.root)
     return 0
 
 

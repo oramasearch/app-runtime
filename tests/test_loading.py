@@ -107,3 +107,21 @@ entrypoint = "dashboard:app"
 port = 8080
 dependencies = ["fastapi>=0.116"]
 """
+
+
+def test_image_mode_loads_the_app_baked_into_the_image(tmp_path: Path) -> None:
+    # lake's build_app copies the App's files into /app; the operator sets no source in image mode.
+    (tmp_path / "app.toml").write_text(
+        'name = "notes"\nframework = "fastapi"\nentrypoint = "main:app"\nport = 8080\n'
+    )
+    (tmp_path / "main.py").write_text("app = object()\n")
+    loaded = load_app({"APP_ROOT": str(tmp_path)})
+    assert loaded.baked is True
+    assert loaded.source is None
+    assert loaded.root == tmp_path
+    assert loaded.config.entrypoint == "main:app"
+
+
+def test_without_source_or_baked_app_the_source_error_remains(tmp_path: Path) -> None:
+    with pytest.raises(ConfigurationError, match="LAKE_URL is required"):
+        load_app({"APP_ROOT": str(tmp_path)})
