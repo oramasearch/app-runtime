@@ -18,6 +18,10 @@ Image mode sets no source. When neither `APP_SOURCE` nor `APP_REPOSITORY` is pre
 The baked root is never removed, and no `APP_TOKEN` is needed. Without either, the source
 variables are required as above.
 
+The operator also sets `APP_AUTH` to the App's auth mode, `lake` or `public`. The runtime trusts
+Lake's forward-auth identity headers only when it is `lake`; see
+[Signed-in user](../data-apps/bindings.md#signed-in-user).
+
 The selected path must contain `app.toml`:
 
 ```toml

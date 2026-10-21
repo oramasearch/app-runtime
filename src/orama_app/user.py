@@ -13,9 +13,46 @@ _CURRENT_USER: ContextVar[dict[str, Any] | None] = ContextVar(
     default=None,
 )
 
+# The operator sets APP_AUTH from the LakeApp's spec.auth. Only on a Lake-protected App does
+# ingress-nginx call Lake's forward auth and set these headers from Lake's answer, replacing (or,
+# when Lake sends none, removing) whatever the client sent. Every other identity header reaches the
+# pod exactly as the client wrote it.
+LAKE_AUTH = "lake"
+FORWARD_AUTH_HEADERS = frozenset({"x-orama-user", "x-orama-space"})
+# Headers earlier runtimes read as identity. No proxy in front of an App sets them, so they are
+# client-controlled on every App and are removed before App code sees the request.
+UNSIGNED_IDENTITY_HEADERS = frozenset(
+    {
+        "x-orama-user-id",
+        "x-orama-user-email",
+        "x-orama-user-name",
+    }
+)
+UNSIGNED_IDENTITY_PREFIXES = ("x-auth-request-",)
+
+
+def app_auth() -> str | None:
+    """Return the App's auth mode as the operator set it, or None outside the operator."""
+    return os.environ.get("APP_AUTH")
+
+
+def forward_auth_trusted() -> bool:
+    """Whether X-Orama-User and X-Orama-Space were set by Lake's forward auth for this App.
+
+    Exactly ``lake``, as the operator writes it; any other value is treated as public.
+    """
+    return app_auth() == LAKE_AUTH
+
+
+def untrusted_identity_header(name: str) -> bool:
+    """Whether a (lower-case) request header is identity the client could have forged."""
+    if name in UNSIGNED_IDENTITY_HEADERS or name.startswith(UNSIGNED_IDENTITY_PREFIXES):
+        return True
+    return name in FORWARD_AUTH_HEADERS and not forward_auth_trusted()
+
 
 def current_user() -> dict[str, Any] | None:
-    """Return the signed-in lake member for this request, when supplied."""
+    """Return the signed-in lake member for this request on a Lake-protected App, else None."""
     user = _CURRENT_USER.get()
     if user is not None:
         return dict(user)
@@ -23,29 +60,23 @@ def current_user() -> dict[str, Any] | None:
     if streamlit_user is not None:
         return streamlit_user
     configured = os.environ.get("ORAMA_CURRENT_USER")
-    if configured:
+    if configured and app_auth() is None:
+        # Local development only: an App the operator runs always has APP_AUTH.
         return decode_user(configured)
     return None
 
 
 def user_from_headers(headers: Mapping[str, str]) -> dict[str, Any] | None:
-    serialized = headers.get("x-orama-user")
-    if serialized:
-        # Lake's forward-auth sends the member's id; a JSON object is also accepted.
-        if not serialized.lstrip().startswith("{"):
-            return {"id": serialized.strip()}
-        return decode_user(serialized)
-    user_id = headers.get("x-orama-user-id") or headers.get("x-auth-request-user")
-    if not user_id:
+    """Read Lake's forward-auth identity; None unless the App is Lake-protected."""
+    if not forward_auth_trusted():
         return None
-    user = {"id": user_id}
-    email = headers.get("x-orama-user-email") or headers.get("x-auth-request-email")
-    name = headers.get("x-orama-user-name")
-    if email:
-        user["email"] = email
-    if name:
-        user["name"] = name
-    return user
+    serialized = headers.get("x-orama-user")
+    if not serialized or not serialized.strip():
+        return None
+    # Lake's forward-auth sends the member's id; a JSON object is also accepted.
+    if not serialized.lstrip().startswith("{"):
+        return {"id": serialized.strip()}
+    return decode_user(serialized)
 
 
 def decode_user(serialized: str) -> dict[str, Any]:
