@@ -78,16 +78,36 @@ def test_expected_binding_is_required_before_startup(
         validate_bindings(BindingRequirements(zetta=True))
 
 
-@pytest.mark.anyio
-async def test_current_user_is_request_local_for_fastapi(tmp_path: Path) -> None:
-    (tmp_path / "current_user_app.py").write_text(
-        "from fastapi import FastAPI\n"
+def write_identity_app(root: Path, module: str) -> None:
+    (root / f"{module}.py").write_text(
+        "from fastapi import FastAPI, Request\n"
         "from orama_app import current_user\n"
         "app = FastAPI()\n"
         "@app.get('/me')\n"
         "async def me():\n"
         "    return current_user()\n"
+        "@app.get('/headers')\n"
+        "async def headers(request: Request):\n"
+        "    return sorted(name for name in request.headers.keys() if name.startswith('x-'))\n"
     )
+
+
+FORGED_IDENTITY_HEADERS = (
+    {"X-Orama-User": "forged-member"},
+    {"X-Orama-User": json.dumps({"id": "forged-member"})},
+    {"X-Orama-User-Id": "forged-member", "X-Orama-User-Email": "forged@example.test"},
+    {"X-Auth-Request-User": "forged-member", "X-Auth-Request-Email": "forged@example.test"},
+)
+
+
+@pytest.mark.anyio
+async def test_current_user_is_request_local_for_fastapi(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # A Lake-protected app: ingress-nginx sets X-Orama-User from Lake's forward-auth answer.
+    monkeypatch.setenv("APP_AUTH", "lake")
+    write_identity_app(tmp_path, "current_user_app")
     application = build_fastapi_application(tmp_path, "current_user_app:app")
     async with httpx.AsyncClient(
         transport=httpx.ASGITransport(app=application),
@@ -98,8 +118,89 @@ async def test_current_user_is_request_local_for_fastapi(tmp_path: Path) -> None
             headers={"X-Orama-User": json.dumps({"id": "user-1", "email": "u@example.com"})},
         )
         assert response.json() == {"id": "user-1", "email": "u@example.com"}
+        bare = await client.get("/me", headers={"X-Orama-User": "member-1"})
+        assert bare.json() == {"id": "member-1"}
         assert (await client.get("/me")).json() is None
     assert current_user() is None
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize("auth", ["public", None, "", "Lake", " lake"])
+async def test_a_public_app_never_trusts_client_identity_headers(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    auth: str | None,
+) -> None:
+    # No forward auth stands in front of a public app (or an app whose operator does not say
+    # it is Lake-protected), so every identity header reached the pod from the client.
+    if auth is None:
+        monkeypatch.delenv("APP_AUTH", raising=False)
+    else:
+        monkeypatch.setenv("APP_AUTH", auth)
+    module = "public_identity_app_" + ("unset" if auth is None else str(abs(hash(auth))))
+    write_identity_app(tmp_path, module)
+    application = build_fastapi_application(tmp_path, f"{module}:app")
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=application),
+        base_url="http://runtime",
+    ) as client:
+        for headers in FORGED_IDENTITY_HEADERS:
+            assert (await client.get("/me", headers=headers)).json() is None
+            # The forged headers are removed before App code can read them itself.
+            assert (await client.get("/headers", headers=headers)).json() == []
+
+
+@pytest.mark.anyio
+async def test_a_lake_protected_app_ignores_the_unsigned_fallback_headers(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # ingress-nginx replaces only X-Orama-User and X-Orama-Space; nothing replaces these.
+    monkeypatch.setenv("APP_AUTH", "lake")
+    write_identity_app(tmp_path, "lake_fallback_identity_app")
+    application = build_fastapi_application(tmp_path, "lake_fallback_identity_app:app")
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=application),
+        base_url="http://runtime",
+    ) as client:
+        for headers in FORGED_IDENTITY_HEADERS[2:]:
+            assert (await client.get("/me", headers=headers)).json() is None
+            assert (await client.get("/headers", headers=headers)).json() == []
+        kept = await client.get(
+            "/headers",
+            headers={
+                "X-Orama-User": "member-1",
+                "X-Orama-Space": "space-1",
+                "X-Auth-Request-User": "forged-member",
+            },
+        )
+        assert kept.json() == ["x-orama-space", "x-orama-user"]
+
+
+def test_user_from_headers_reads_only_forward_auth_on_a_lake_protected_app(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from orama_app.user import user_from_headers
+
+    monkeypatch.setenv("APP_AUTH", "public")
+    assert user_from_headers({"x-orama-user": "forged-member"}) is None
+    monkeypatch.delenv("APP_AUTH")
+    assert user_from_headers({"x-orama-user": "forged-member"}) is None
+    monkeypatch.setenv("APP_AUTH", "lake")
+    assert user_from_headers({"x-auth-request-user": "forged-member"}) is None
+    assert user_from_headers({"x-orama-user-id": "forged-member"}) is None
+    assert user_from_headers({"x-orama-user": "member-1"}) == {"id": "member-1"}
+
+
+def test_orama_current_user_is_for_local_development_only(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("ORAMA_CURRENT_USER", json.dumps({"id": "local-dev"}))
+    monkeypatch.delenv("APP_AUTH", raising=False)
+    assert current_user() == {"id": "local-dev"}
+    for auth in ("public", "lake"):
+        monkeypatch.setenv("APP_AUTH", auth)
+        assert current_user() is None
 
 
 def test_data_dashboard_uses_a_fake_zetta_binding(
@@ -167,9 +268,10 @@ class FakeStreamlit:
         return choices[0]
 
 
-def test_lake_forward_auth_sends_a_bare_member_id() -> None:
+def test_lake_forward_auth_sends_a_bare_member_id(monkeypatch: pytest.MonkeyPatch) -> None:
     from orama_app.user import user_from_headers
 
+    monkeypatch.setenv("APP_AUTH", "lake")
     assert user_from_headers({"x-orama-user": "accc9652-3ade-4c07-8047-b0fa3c909f90"}) == {
         "id": "accc9652-3ade-4c07-8047-b0fa3c909f90"
     }
@@ -219,3 +321,52 @@ def test_a_bare_token_binding_stops_startup(
     monkeypatch.setenv("ORAMA_BINDINGS_DIR", str(tmp_path))
     with pytest.raises(ConfigurationError, match="binding is not valid JSON"):
         validate_bindings(BindingRequirements(zetta=True))
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize(
+    ("auth", "forwarded"),
+    [("public", []), ("lake", ["x-orama-space", "x-orama-user"])],
+)
+async def test_the_streamlit_proxy_forwards_only_trusted_identity_headers(
+    monkeypatch: pytest.MonkeyPatch,
+    auth: str,
+    forwarded: list[str],
+) -> None:
+    from app_runtime import streamlit_proxy
+
+    monkeypatch.setenv("APP_AUTH", auth)
+    seen: list[list[str]] = []
+
+    def record(request: httpx.Request) -> httpx.Response:
+        seen.append(sorted(name for name in request.headers.keys() if name.startswith("x-")))
+        return httpx.Response(200, text="ok")
+
+    real_client = httpx.AsyncClient
+
+    def client_with_fake_transport(*args: Any, **kwargs: Any) -> httpx.AsyncClient:
+        kwargs["transport"] = httpx.MockTransport(record)
+        return real_client(*args, **kwargs)
+
+    monkeypatch.setattr(streamlit_proxy.httpx, "AsyncClient", client_with_fake_transport)
+
+    class FakeProcess:
+        http_url = "http://streamlit.invalid"
+        process = None
+
+    application = streamlit_proxy.build_streamlit_proxy(FakeProcess())  # type: ignore[arg-type]
+    async with real_client(
+        transport=httpx.ASGITransport(app=application),
+        base_url="http://runtime",
+    ) as client:
+        response = await client.get(
+            "/page",
+            headers={
+                "X-Orama-User": "member-1",
+                "X-Orama-Space": "space-1",
+                "X-Orama-User-Id": "forged-member",
+                "X-Auth-Request-User": "forged-member",
+            },
+        )
+    assert response.status_code == 200
+    assert seen == [forwarded]

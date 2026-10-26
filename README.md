@@ -4,7 +4,7 @@ The Python base runtime that runs lake Apps. It loads an App from a lake reposit
 revision, validates `app.toml` without installing anything, and serves FastAPI, Streamlit or static
 content. Epic: oramasearch/lake#297.
 
-Released: [v0.1.0](docs/releases/v0.1.0.md). Private. Its image is published **private** as `oramasearch/app-runtime` on Docker Hub.
+Released: [v0.1.1](docs/releases/v0.1.1.md). Private. Its image is published **private** as `oramasearch/app-runtime` on Docker Hub.
 
 ## Source and manifest
 
@@ -42,7 +42,9 @@ a read-only root filesystem and writable `/tmp`.
 The operator mounts binding JSON at `/var/run/orama/bindings/zetta` and
 `/var/run/orama/bindings/services/<name>`. The `orama_app` package provides `zetta()` for governed
 workspace SQL, datasets, runs, models and scoring; `service(name)` for Service connection fields;
-and request-local `current_user()` for `auth: lake`. See [`orama_app` and bindings](docs/data-apps/bindings.md)
+and request-local `current_user()`, which is the signed-in member only on a Lake-protected App
+(`APP_AUTH=lake`, set by the operator) and `None` on a public one; identity headers a client could
+forge are removed before App code sees the request. See [`orama_app` and bindings](docs/data-apps/bindings.md)
 for file shapes and examples.
 
 [`examples/data-dashboard`](examples/data-dashboard/) is a Streamlit App that lists datasets from
