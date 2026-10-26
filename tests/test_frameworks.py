@@ -187,3 +187,83 @@ async def read_state():
         assert lifespan_app.state["stopped"] is True
     finally:
         shutil.rmtree(loaded.root)
+
+
+@pytest.mark.anyio
+async def test_streamlit_websocket_from_the_apps_public_host_is_relayed_without_stalling() -> None:
+    """A browser on the app's public host opens Streamlit's stream, and Streamlit keeps answering pages.
+
+    Streamlit's own origin check does not know the public host; checking it made Streamlit look up its external IP with
+    a blocking HTTP call, which a pod without internet egress waits on while every page times out (lake#798 follow-up).
+    """
+    import asyncio
+    import threading
+    import time
+
+    import uvicorn
+    from websockets.asyncio.client import connect
+    from websockets.exceptions import InvalidStatus
+
+    loaded = fake_lake_app(
+        """\
+name = "Dashboard"
+framework = "streamlit"
+entrypoint = "dashboard.py"
+port = 8080
+dependencies = ["streamlit"]
+""",
+        "import streamlit as st\nst.title('Dashboard')\n",
+        "dashboard.py",
+    )
+    process = StreamlitProcess(loaded.root, loaded.config.entrypoint)
+    server: uvicorn.Server | None = None
+    try:
+        process.start()
+        port = available_test_port()
+        server = uvicorn.Server(
+            uvicorn.Config(build_streamlit_proxy(process), host="127.0.0.1", port=port, log_level="warning")
+        )
+        threading.Thread(target=server.run, daemon=True).start()
+        deadline = time.monotonic() + 10
+        while not server.started and time.monotonic() < deadline:
+            await asyncio.sleep(0.05)
+        public = "dashboard.us.lake.example"
+        # The URI carries the public host (so the Host header is it); the socket goes to 127.0.0.1.
+        url = f"ws://{public}:{port}/_stcore/stream"
+
+        async with connect(
+            url,
+            host="127.0.0.1",
+            port=port,
+            additional_headers={"Origin": f"https://{public}:{port}"},
+            subprotocols=["streamlit"],
+        ) as stream:
+            assert stream.subprotocol == "streamlit"
+            started = time.monotonic()
+            async with httpx.AsyncClient() as client:
+                page = await client.get(f"http://127.0.0.1:{port}/", headers={"Host": public}, timeout=5)
+            assert page.status_code == 200
+            assert time.monotonic() - started < 2
+
+        with pytest.raises(InvalidStatus):
+            async with connect(
+                url,
+                host="127.0.0.1",
+                port=port,
+                additional_headers={"Origin": "https://elsewhere.example"},
+                subprotocols=["streamlit"],
+            ):
+                pass
+    finally:
+        if server is not None:
+            server.should_exit = True
+        process.stop()
+        shutil.rmtree(loaded.root)
+
+
+def available_test_port() -> int:
+    import socket
+
+    with socket.socket() as probe:
+        probe.bind(("127.0.0.1", 0))
+        return probe.getsockname()[1]
