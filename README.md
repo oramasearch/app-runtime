@@ -4,7 +4,7 @@ The Python base runtime that runs lake Apps. It loads an App from a lake reposit
 revision, validates `app.toml` without installing anything, and serves FastAPI, Streamlit or static
 content. Epic: oramasearch/lake#297.
 
-Private. Its image is published **private** as `oramasearch/app-runtime` on Docker Hub.
+Released: [v0.1.0](docs/releases/v0.1.0.md). Private. Its image is published **private** as `oramasearch/app-runtime` on Docker Hub.
 
 ## Source and manifest
 
