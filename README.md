@@ -27,7 +27,10 @@ installed and satisfies its specifier (URL requirements are always refused).
 FastAPI Apps name a `module:object`, Streamlit Apps name a Python script and static Apps name a
 content directory. Every framework serves `/healthz` and `/readyz` on the public port. `APP_PORT`
 overrides the manifest port; the image defaults it to 8080. Streamlit runs on loopback behind the
-runtime so its application traffic and the common health contract share one public port. Details
+runtime so its application traffic and the common health contract share one public port. The runtime
+accepts Streamlit's WebSocket only from a page on the host it was sent to, and gives Streamlit its own
+loopback origin, so Streamlit never looks up its external IP (a blocking call a pod without internet
+egress waits on). Details
 are in [Frameworks and health](docs/runtime/frameworks.md). The downloaded App root remains on
 Python's module path while it is served, including for imports performed inside request handlers.
 
