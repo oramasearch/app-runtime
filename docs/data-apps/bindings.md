@@ -12,6 +12,12 @@ in `app.toml`; startup stops before importing App code if a required file is mis
 {"lake_url":"https://lake.example","customer_id":"customer-id","token":"scoped-token"}
 ```
 
+The orama-operator writes exactly this shape, with `lake_url` set to the app's in-cluster
+`LAKE_URL` (`http://lake-<lake>.<namespace>.svc.cluster.local:80/w/<workspace id>`). Its bytes are a
+contract: `tests/fixtures/operator-zetta-binding.json` is a copy of the operator's
+`internal/controller/testdata/app-binding-zetta.json`, and both repositories test it. A bare token in
+this file is not JSON and stops startup with *"binding is not valid JSON"* (lake#1205).
+
 The token goes only to lake's workspace proxy at
 `/workspaces/<customer_id>/zetta/v1/<capability>`. Apps use it through the helper:
 
