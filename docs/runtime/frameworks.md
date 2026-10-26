@@ -12,6 +12,12 @@ Entrypoints depend on the framework:
 - Streamlit uses a Python file such as `dashboard.py`. Streamlit listens only on an ephemeral
   loopback port. The public Uvicorn process owns the health routes and proxies HTTP and WebSocket
   traffic to Streamlit. Readiness checks Streamlit's own health endpoint.
+  - A WebSocket is relayed only when its `Origin` names the host it was sent to (the app's public host);
+    any other origin is closed with 1008. Streamlit receives its own loopback address as the origin.
+    Its own check does not know the public host, and checking an unknown host makes it look up its
+    external IP with a blocking call to `checkip.amazonaws.com`. A workspace pod has no internet egress,
+    so every page stalled while the lookup timed out, and the stream got 403.
+  - Streamlit starts with `--browser.serverAddress=127.0.0.1` for the same reason.
 - Static uses a directory such as `public`. The runtime serves it with HTML index support below
   the probe routes.
 

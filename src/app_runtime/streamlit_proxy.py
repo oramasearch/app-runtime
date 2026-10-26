@@ -11,11 +11,12 @@ import time
 from contextlib import suppress
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit
 
 import httpx
 from fastapi import FastAPI, Request, Response, WebSocket, WebSocketDisconnect
 from websockets.asyncio.client import connect
-from websockets.exceptions import ConnectionClosed
+from websockets.exceptions import ConnectionClosed, InvalidHandshake
 
 from app_runtime.errors import ConfigurationError, LoadError
 from app_runtime.frameworks import confined_path
@@ -68,6 +69,9 @@ class StreamlitProcess:
             "--server.address=127.0.0.1",
             f"--server.port={self.port}",
             "--server.headless=true",
+            # A manually set address means Streamlit never looks up an external IP. The lookup is a blocking HTTP call
+            # to checkip.amazonaws.com that a workspace pod (no internet egress) waits on for ten seconds.
+            "--browser.serverAddress=127.0.0.1",
             "--server.fileWatcherType=none",
             "--browser.gatherUsageStats=false",
         ]
@@ -153,6 +157,9 @@ def build_streamlit_proxy(process: StreamlitProcess) -> FastAPI:
     @application.websocket("/{path:path}")
     async def proxy_websocket(websocket: WebSocket, path: str) -> None:
         query = f"?{websocket.url.query}" if websocket.url.query else ""
+        if not same_origin(websocket.headers.get("origin"), websocket.headers.get("host")):
+            await websocket.close(code=1008)
+            return
         requested = websocket.headers.get("sec-websocket-protocol", "")
         subprotocols = [item.strip() for item in requested.split(",") if item.strip()]
         forwarded_headers = {
@@ -162,6 +169,7 @@ def build_streamlit_proxy(process: StreamlitProcess) -> FastAPI:
             not in {
                 "connection",
                 "host",
+                "origin",
                 "sec-websocket-extensions",
                 "sec-websocket-key",
                 "sec-websocket-protocol",
@@ -172,16 +180,27 @@ def build_streamlit_proxy(process: StreamlitProcess) -> FastAPI:
         try:
             async with connect(
                 f"{process.websocket_url}/{path}{query}",
-                additional_headers=forwarded_headers,
+                # The browser's origin is checked above. Streamlit sees its own address instead: its own check does not
+                # know the app's public host, and checking an unknown host makes it look up its external IP (above).
+                additional_headers={**forwarded_headers, "Origin": process.http_url},
                 subprotocols=subprotocols or None,
             ) as upstream:
                 await websocket.accept(subprotocol=upstream.subprotocol)
                 await relay_websocket(websocket, upstream)
-        except (ConnectionClosed, OSError):
+        except (ConnectionClosed, InvalidHandshake, OSError):
             with suppress(RuntimeError):
                 await websocket.close(code=1011)
 
     return application
+
+
+def same_origin(origin: str | None, host: str | None) -> bool:
+    """Whether a WebSocket's Origin is the host it was sent to; a request without Origin is not from a browser page."""
+    if origin is None:
+        return True
+    if not host:
+        return False
+    return urlsplit(origin).netloc.lower() == host.lower()
 
 
 async def relay_websocket(websocket: WebSocket, upstream: Any) -> None:

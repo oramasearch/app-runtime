@@ -177,3 +177,45 @@ def test_lake_forward_auth_sends_a_bare_member_id() -> None:
         "id": "u1",
         "email": "a@example.test",
     }
+
+
+# The operator writes this exact file (orama-operator internal/controller/testdata/
+# app-binding-zetta.json, checked byte for byte by its contract test). lake#1205: the operator
+# used to write the bare token, which stopped every App with workspace data at startup.
+OPERATOR_ZETTA_BINDING = Path(__file__).parent / "fixtures" / "operator-zetta-binding.json"
+
+
+def test_the_operators_zetta_binding_reaches_the_workspace_through_lake(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    (tmp_path / "zetta").write_bytes(OPERATOR_ZETTA_BINDING.read_bytes())
+    monkeypatch.setenv("ORAMA_BINDINGS_DIR", str(tmp_path))
+    validate_bindings(BindingRequirements(zetta=True))
+    requests: list[httpx.Request] = []
+
+    def fake_lake(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        return httpx.Response(200, json={"ok": True, "value": {"datasets": []}})
+
+    with zetta(_transport=httpx.MockTransport(fake_lake)) as workspace:
+        assert workspace.datasets() == []
+    assert len(requests) == 1
+    assert requests[0].url.host == "lake-dev.lake-dev.svc.cluster.local"
+    assert requests[0].url.path == (
+        "/w/11111111-2222-4333-8444-555555555555"
+        "/workspaces/0f1e2d3c-4b5a-6978-8796-a5b4c3d2e1f0/zetta/v1/list_datasets"
+    )
+    assert requests[0].headers["authorization"] == (
+        "Bearer 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+    )
+
+
+def test_a_bare_token_binding_stops_startup(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    (tmp_path / "zetta").write_text("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef")
+    monkeypatch.setenv("ORAMA_BINDINGS_DIR", str(tmp_path))
+    with pytest.raises(ConfigurationError, match="binding is not valid JSON"):
+        validate_bindings(BindingRequirements(zetta=True))
