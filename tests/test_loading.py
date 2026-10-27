@@ -125,3 +125,18 @@ def test_image_mode_loads_the_app_baked_into_the_image(tmp_path: Path) -> None:
 def test_without_source_or_baked_app_the_source_error_remains(tmp_path: Path) -> None:
     with pytest.raises(ConfigurationError, match="LAKE_URL is required"):
         load_app({"APP_ROOT": str(tmp_path)})
+
+
+def test_repository_file_bytes_come_from_content_base64_unchanged() -> None:
+    import base64
+
+    from app_runtime.lake import decode_contents
+
+    source = 'st.title("\U0001f465 Customer Insights") · café\n'.encode()
+    # What Lake answers: exact bytes in content_base64, and a lossy text form in contents (2026-10-26).
+    body = {
+        "content_base64": base64.b64encode(source).decode(),
+        "contents": 'st.title("\\xF0\\x9F\\x91\\xA5 Customer Insights") \\xC2\\xB7 caf\\xC3\\xA9\n',
+    }
+    assert decode_contents(body, "app.py") == source
+    assert decode_contents({"contents": "plain"}, "app.py") == b"plain"
