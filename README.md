@@ -4,7 +4,7 @@ The Python base runtime that runs lake Apps. It loads an App from a lake reposit
 revision, validates `app.toml` without installing anything, and serves FastAPI, Streamlit or static
 content. Epic: oramasearch/lake#297.
 
-Released: [v0.1.2](docs/releases/v0.1.2.md). Private. Its image is published **private** as `oramasearch/app-runtime` on Docker Hub.
+Released: [v0.1.3](docs/releases/v0.1.3.md). Private. Its image is published **private** as `oramasearch/app-runtime` on Docker Hub.
 
 ## Source and manifest
 
@@ -30,7 +30,8 @@ overrides the manifest port; the image defaults it to 8080. Streamlit runs on lo
 runtime so its application traffic and the common health contract share one public port. The runtime
 accepts Streamlit's WebSocket only from a page on the host it was sent to, and gives Streamlit its own
 loopback origin, so Streamlit never looks up its external IP (a blocking call a pod without internet
-egress waits on). Details
+egress waits on). It relays Streamlit's messages whatever their size, so a page with a large table or
+chart keeps updating. Details
 are in [Frameworks and health](docs/runtime/frameworks.md). The downloaded App root remains on
 Python's module path while it is served, including for imports performed inside request handlers.
 
