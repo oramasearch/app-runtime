@@ -1,6 +1,6 @@
 [project]
 name = "orama-app-runtime"
-version = "0.1.1"
+version = "0.1.2"
 description = "Loads and serves an Orama App from a pinned lake repository revision"
 readme = "README.md"
 requires-python = ">=3.12,<3.15"
