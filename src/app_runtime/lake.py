@@ -108,6 +108,14 @@ def relative_app_path(repository_path: Any, root: str) -> str | None:
 def decode_contents(body: Any, path: str) -> bytes:
     if not isinstance(body, dict):
         raise LoadError(f"repository_file returned an invalid value for {path}")
+    # The file's exact bytes. Lake's `contents` text writes every non-ASCII byte as literal `\xNN` text, so an App's
+    # emoji or accent arrived as `\xF0\x9F...` on the page (2026-10-26); `content_base64` carries the bytes unchanged.
+    exact = body.get("content_base64")
+    if isinstance(exact, str):
+        try:
+            return base64.b64decode(exact, validate=True)
+        except ValueError as error:
+            raise LoadError(f"repository_file returned invalid base64 for {path}") from error
     contents = body.get("contents")
     if not isinstance(contents, str):
         raise LoadError(f"repository_file returned no contents for {path}")

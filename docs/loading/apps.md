@@ -8,7 +8,9 @@ APP_SOURCE=<lake_url>|<repository>|<revision>|<path>
 ```
 
 or `LAKE_URL`, `APP_REPOSITORY`, `APP_REVISION` and optional `APP_PATH` separately. `APP_TOKEN` is
-the bearer token used for lake's `repository_tree` and `repository_file` capabilities. A missing
+the bearer token used for lake's `repository_tree` and `repository_file` capabilities. Each file's bytes are taken from `content_base64`
+(exact); Lake's `contents` text form writes non-ASCII bytes as `\xNN` text and is used only when no base64 form is
+sent. A missing
 revision is refused. The files are written below `/tmp`, so the image's root filesystem can remain
 read-only.
 
