@@ -184,6 +184,11 @@ def build_streamlit_proxy(process: StreamlitProcess) -> FastAPI:
                 # know the app's public host, and checking an unknown host makes it look up its external IP (above).
                 additional_headers={**forwarded_headers, "Origin": process.http_url},
                 subprotocols=subprotocols or None,
+                # No size limit on what Streamlit sends (app-runtime#26). Streamlit sends a whole page update as one
+                # message: a large table or chart is more than websockets' default 1 MiB, and refusing it closes the
+                # stream, so the page never updates again. The sender is the App's own Streamlit on loopback, which
+                # already limits its messages (server.maxMessageSize, 200 MB by default).
+                max_size=None,
             ) as upstream:
                 await websocket.accept(subprotocol=upstream.subprotocol)
                 await relay_websocket(websocket, upstream)

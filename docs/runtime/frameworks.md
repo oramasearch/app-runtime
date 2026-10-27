@@ -18,6 +18,11 @@ Entrypoints depend on the framework:
     external IP with a blocking call to `checkip.amazonaws.com`. A workspace pod has no internet egress,
     so every page stalled while the lookup timed out, and the stream got 403.
   - Streamlit starts with `--browser.serverAddress=127.0.0.1` for the same reason.
+  - The relay sets no size limit on messages from Streamlit (app-runtime#26). Streamlit sends a whole
+    page update as one message, and a page with a large table or chart is more than the websockets
+    library's default 1 MiB. With that limit the proxy closed the stream, and the page stayed on
+    *running* without updating again, so a sidebar filter did nothing (agent-application#64). Streamlit
+    already limits its own messages (`server.maxMessageSize`, 200 MB by default).
 - Static uses a directory such as `public`. The runtime serves it with HTML index support below
   the probe routes.
 
