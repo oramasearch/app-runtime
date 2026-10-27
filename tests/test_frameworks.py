@@ -261,6 +261,56 @@ dependencies = ["streamlit"]
         shutil.rmtree(loaded.root)
 
 
+@pytest.mark.anyio
+async def test_streamlit_websocket_relays_a_message_larger_than_one_mebibyte() -> None:
+    """A Streamlit page update over 1 MiB reaches the browser, and the stream stays open (app-runtime#26).
+
+    Streamlit sends a whole page update as one message; a large table or chart is more than websockets' default
+    1 MiB. With that limit on the upstream connection the proxy closed the stream, and the page never updated again:
+    a sidebar filter did nothing (agent-application#64).
+    """
+    import asyncio
+    import threading
+    import time
+    from types import SimpleNamespace
+
+    import uvicorn
+    from websockets.asyncio.client import connect
+    from websockets.asyncio.server import serve
+
+    large = bytes(range(256)) * (6 * 1024)  # 1.5 MiB, about the size measured on agent-application#64's App
+    small = b"after"
+
+    async def fake_streamlit(connection) -> None:
+        await connection.recv()  # the browser's rerun request
+        await connection.send(large)
+        await connection.send(small)
+        await connection.wait_closed()
+
+    async with serve(fake_streamlit, "127.0.0.1", 0, max_size=None) as upstream:
+        upstream_port = upstream.sockets[0].getsockname()[1]
+        process = SimpleNamespace(
+            process=None,
+            http_url=f"http://127.0.0.1:{upstream_port}",
+            websocket_url=f"ws://127.0.0.1:{upstream_port}",
+        )
+        port = available_test_port()
+        server = uvicorn.Server(
+            uvicorn.Config(build_streamlit_proxy(process), host="127.0.0.1", port=port, log_level="warning")
+        )
+        threading.Thread(target=server.run, daemon=True).start()
+        try:
+            deadline = time.monotonic() + 10
+            while not server.started and time.monotonic() < deadline:
+                await asyncio.sleep(0.05)
+            async with connect(f"ws://127.0.0.1:{port}/_stcore/stream", max_size=None) as stream:
+                await stream.send(b"rerun")
+                assert await asyncio.wait_for(stream.recv(), 10) == large
+                assert await asyncio.wait_for(stream.recv(), 10) == small
+        finally:
+            server.should_exit = True
+
+
 def available_test_port() -> int:
     import socket
 
