@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 """Install lake-auth identity in request-local App context."""
 
 from __future__ import annotations

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 """Read an App definition through lake's repository REST capabilities."""
 
 from __future__ import annotations

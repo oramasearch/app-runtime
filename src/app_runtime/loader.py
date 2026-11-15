@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 """Materialize and validate an App before importing any of its code."""
 
 from __future__ import annotations

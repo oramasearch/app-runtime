@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 """Orama App runtime."""
 
 from app_runtime.config import AppConfig

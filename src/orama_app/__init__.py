@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 """Helpers available to Apps running in app-runtime."""
 
 from orama_app.bindings import BindingError, service, zetta

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 """The operator-facing environment contract for an App source."""
 
 from __future__ import annotations

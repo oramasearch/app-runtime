@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 """Run Streamlit privately and expose it with the runtime health contract."""
 
 from __future__ import annotations

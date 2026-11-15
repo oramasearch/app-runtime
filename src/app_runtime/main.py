@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 """Runtime command-line entrypoint."""
 
 from __future__ import annotations

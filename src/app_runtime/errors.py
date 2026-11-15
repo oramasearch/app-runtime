@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 """Errors reported before an App process starts serving traffic."""
 
 
