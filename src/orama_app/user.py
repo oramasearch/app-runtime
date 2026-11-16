@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 """Per-request lake-auth identity exposed to App code."""
 
 from __future__ import annotations

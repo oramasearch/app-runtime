@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 """Load operator-provided connection bindings from files."""
 
 from __future__ import annotations

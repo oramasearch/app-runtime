@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 """A small dashboard over a dataset in the bound workspace."""
 
 from __future__ import annotations

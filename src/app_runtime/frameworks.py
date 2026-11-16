@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 """Build the public server for each supported App framework."""
 
 from __future__ import annotations

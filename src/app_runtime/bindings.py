@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 """Validate an App's declared bindings before it starts serving."""
 
 from __future__ import annotations
