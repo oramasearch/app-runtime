@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 """Parse and validate an App's app.toml manifest."""
 
 from __future__ import annotations

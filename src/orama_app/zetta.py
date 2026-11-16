@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 """A small client for the workspace's filtered Zetta REST capabilities."""
 
 from __future__ import annotations

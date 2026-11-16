@@ -28,5 +28,5 @@ Entrypoints depend on the framework:
 
 The image uses Python 3.12, runs as UID 10001, writes downloaded source only below `/tmp`, disables
 bytecode writes and uses `/tmp` as `HOME`. It is compatible with a read-only root filesystem and a
-writable `/tmp` mount. The private image is built and pushed by the cluster BuildKit after review;
+writable `/tmp` mount. The image is built and pushed by a BuildKit on amd64 after review;
 workstations do not build or publish it.
