@@ -2,10 +2,10 @@
   "$schema": "http://cyclonedx.org/schema/bom-1.7.schema.json",
   "bomFormat": "CycloneDX",
   "specVersion": "1.7",
-  "serialNumber": "urn:uuid:d5878a03-b150-5078-8b0b-90685247c26a",
+  "serialNumber": "urn:uuid:440f1e39-4872-5bff-b500-1d5b8147399b",
   "version": 1,
   "metadata": {
-    "timestamp": "2026-11-16T06:26:09Z",
+    "timestamp": "2026-11-16T07:30:32Z",
     "tools": {
       "components": [
         {
@@ -293,7 +293,7 @@
       "bom-ref": "DocumentRoot",
       "type": "library",
       "name": "app-runtime",
-      "version": "cbc0b98bb00e",
+      "version": "v0.2.0",
       "licenses": [
         {
           "license": {
@@ -1695,12 +1695,12 @@
       ]
     },
     {
-      "bom-ref": "pkg:pypi/orama-app-runtime@0.1.3?package-id=Package-python-orama-app-runtime-aacfa6aabf8b98c3",
+      "bom-ref": "pkg:pypi/orama-app-runtime@0.2.0?package-id=Package-python-orama-app-runtime-1e0385f87dc6a25e",
       "type": "library",
       "name": "orama-app-runtime",
-      "version": "0.1.3",
-      "cpe": "cpe:2.3:a:python-orama-app-runtime:python-orama-app-runtime:0.1.3:*:*:*:*:*:*:*",
-      "purl": "pkg:pypi/orama-app-runtime@0.1.3",
+      "version": "0.2.0",
+      "cpe": "cpe:2.3:a:python-orama-app-runtime:python-orama-app-runtime:0.2.0:*:*:*:*:*:*:*",
+      "purl": "pkg:pypi/orama-app-runtime@0.2.0",
       "properties": [
         {
           "name": "syft:package:language",
@@ -1712,191 +1712,191 @@
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:python-orama-app-runtime:python_orama_app_runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:python-orama-app-runtime:python_orama_app_runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:python_orama_app_runtime:python-orama-app-runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:python_orama_app_runtime:python-orama-app-runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:python_orama_app_runtime:python_orama_app_runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:python_orama_app_runtime:python_orama_app_runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:orama-app-runtime:python-orama-app-runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:orama-app-runtime:python-orama-app-runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:orama-app-runtime:python_orama_app_runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:orama-app-runtime:python_orama_app_runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:orama_app_runtime:python-orama-app-runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:orama_app_runtime:python-orama-app-runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:orama_app_runtime:python_orama_app_runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:orama_app_runtime:python_orama_app_runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:python-orama-app-runtime:orama-app-runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:python-orama-app-runtime:orama-app-runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:python-orama-app-runtime:orama_app_runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:python-orama-app-runtime:orama_app_runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:python_orama_app_runtime:orama-app-runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:python_orama_app_runtime:orama-app-runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:python_orama_app_runtime:orama_app_runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:python_orama_app_runtime:orama_app_runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:python-orama-app:python-orama-app-runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:python-orama-app:python-orama-app-runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:python-orama-app:python_orama_app_runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:python-orama-app:python_orama_app_runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:python_orama_app:python-orama-app-runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:python_orama_app:python-orama-app-runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:python_orama_app:python_orama_app_runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:python_orama_app:python_orama_app_runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:python-orama:python-orama-app-runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:python-orama:python-orama-app-runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:python-orama:python_orama_app_runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:python-orama:python_orama_app_runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:python_orama:python-orama-app-runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:python_orama:python-orama-app-runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:python_orama:python_orama_app_runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:python_orama:python_orama_app_runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:orama-app-runtime:orama-app-runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:orama-app-runtime:orama-app-runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:orama-app-runtime:orama_app_runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:orama-app-runtime:orama_app_runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:orama_app_runtime:orama-app-runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:orama_app_runtime:orama-app-runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:orama_app_runtime:orama_app_runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:orama_app_runtime:orama_app_runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:orama-app:python-orama-app-runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:orama-app:python-orama-app-runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:orama-app:python_orama_app_runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:orama-app:python_orama_app_runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:orama_app:python-orama-app-runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:orama_app:python-orama-app-runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:orama_app:python_orama_app_runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:orama_app:python_orama_app_runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:python-orama-app:orama-app-runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:python-orama-app:orama-app-runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:python-orama-app:orama_app_runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:python-orama-app:orama_app_runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:python_orama_app:orama-app-runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:python_orama_app:orama-app-runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:python_orama_app:orama_app_runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:python_orama_app:orama_app_runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:python:python-orama-app-runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:python:python-orama-app-runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:python:python_orama_app_runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:python:python_orama_app_runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:orama:python-orama-app-runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:orama:python-orama-app-runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:orama:python_orama_app_runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:orama:python_orama_app_runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:python-orama:orama-app-runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:python-orama:orama-app-runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:python-orama:orama_app_runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:python-orama:orama_app_runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:python_orama:orama-app-runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:python_orama:orama-app-runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:python_orama:orama_app_runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:python_orama:orama_app_runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:orama-app:orama-app-runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:orama-app:orama-app-runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:orama-app:orama_app_runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:orama-app:orama_app_runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:orama_app:orama-app-runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:orama_app:orama-app-runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:orama_app:orama_app_runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:orama_app:orama_app_runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:python:orama-app-runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:python:orama-app-runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:python:orama_app_runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:python:orama_app_runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:orama:orama-app-runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:orama:orama-app-runtime:0.2.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:orama:orama_app_runtime:0.1.3:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:orama:orama_app_runtime:0.2.0:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -4398,7 +4398,7 @@
       ]
     },
     {
-      "ref": "pkg:pypi/orama-app-runtime@0.1.3?package-id=Package-python-orama-app-runtime-aacfa6aabf8b98c3",
+      "ref": "pkg:pypi/orama-app-runtime@0.2.0?package-id=Package-python-orama-app-runtime-1e0385f87dc6a25e",
       "dependsOn": [
         "pkg:pypi/fastapi@0.116.1?package-id=Package-python-fastapi-b526e95206c76bc1",
         "pkg:pypi/httpx@0.28.1?package-id=Package-python-httpx-b8665b7937415e27",
