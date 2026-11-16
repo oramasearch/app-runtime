@@ -2,6 +2,7 @@
 
 | Version | Date | Notes |
 |---|---|---|
+| [v0.2.0](v0.2.0.md) | 2026-11-16 | The open-source release preparation: MIT licence, `SECURITY.md`, base images pinned by digest, a clean public tree |
 | [v0.1.3](v0.1.3.md) | 2026-10-27 | A patch: Streamlit page updates over 1 MiB reach the browser |
 | [v0.1.2](v0.1.2.md) | 2026-10-26 | Apps show non-ASCII text correctly: file bytes from `content_base64` (#22) |
 | [v0.1.1](v0.1.1.md) | 2026-10-26 | Identity headers trusted only behind Lake's forward auth (#14) |
