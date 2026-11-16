@@ -2,17 +2,17 @@
   "spdxVersion": "SPDX-2.3",
   "dataLicense": "CC0-1.0",
   "SPDXID": "SPDXRef-DOCUMENT",
-  "name": "app-runtime-691017863eda",
-  "documentNamespace": "https://github.com/oramasearch/app-runtime/sbom/691017863eda0a3132c192cc875a2f0700abceaa",
+  "name": "app-runtime-cbc0b98bb00e",
+  "documentNamespace": "https://github.com/oramasearch/app-runtime/sbom/cbc0b98bb00e0fe7368c3ad62f57d0c7feaed716",
   "creationInfo": {
-    "created": "2026-11-16T01:54:46Z",
+    "created": "2026-11-16T06:26:09Z",
     "creators": [
       "Organization: OramaSearch, Inc.",
       "Tool: tools/sbom.py",
       "Tool: syft"
     ],
     "licenseListVersion": "3.29",
-    "comment": "Made from source commit 691017863eda0a3132c192cc875a2f0700abceaa by tools/sbom.py."
+    "comment": "Made from source commit cbc0b98bb00e0fe7368c3ad62f57d0c7feaed716 by tools/sbom.py."
   },
   "documentDescribes": [
     "SPDXRef-DocumentRoot"
@@ -358,7 +358,7 @@
     {
       "name": "app-runtime",
       "SPDXID": "SPDXRef-DocumentRoot",
-      "versionInfo": "691017863eda",
+      "versionInfo": "cbc0b98bb00e",
       "downloadLocation": "git+https://github.com/oramasearch/app-runtime.git",
       "homepage": "https://github.com/oramasearch/app-runtime",
       "filesAnalyzed": false,
@@ -3595,6 +3595,26 @@
       ]
     },
     {
+      "name": "python",
+      "SPDXID": "SPDXRef-Image-python-bbeb47b8d77ac77d",
+      "versionInfo": "3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "supplier": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "primaryPackagePurpose": "CONTAINER",
+      "comment": "Container base image (python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b), FROM in Dockerfile. Its own packages are in the image SBOM of each release image.",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:docker/python@sha256%3A5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b?tag=3.12-slim"
+        }
+      ]
+    },
+    {
       "name": "python-dateutil",
       "SPDXID": "SPDXRef-Package-python-python-dateutil-e92706dfa2bf9cd1",
       "versionInfo": "2.9.0.post0",
@@ -5470,6 +5490,11 @@
     },
     {
       "relatedSpdxElement": "SPDXRef-Image-python-3e064d07035dff47",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-DocumentRoot"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Image-python-bbeb47b8d77ac77d",
       "relationshipType": "DEPENDS_ON",
       "spdxElementId": "SPDXRef-DocumentRoot"
     },
